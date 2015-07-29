@@ -4,7 +4,7 @@ name 'datadog-agent'
 
 local_agent_repo = ENV['LOCAL_AGENT_REPO']
 if local_agent_repo.nil? || local_agent_repo.empty?
-  source git: 'https://github.com/DataDog/dd-agent.git'
+  source git: 'https://github.com/fastly/dd-agent.git'
 else
   # For local development
   source path: ENV['LOCAL_AGENT_REPO']
@@ -46,10 +46,25 @@ build do
         copy 'packaging/debian/start_agent.sh', '/opt/datadog-agent/bin/start_agent.sh'
         command 'chmod 755 /opt/datadog-agent/bin/start_agent.sh'
       end
-      copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
-      copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
-      copy 'conf.d', '/etc/dd-agent/'
-      mkdir '/etc/dd-agent/checks.d/'
+
+      if Ohai['platform_family'] == 'arista'
+        command 'mkdir -p /etc/dd-agent/checks.d/'
+        command 'mkdir -p /persist/sys/dd-agent/checks.d/'
+        command 'mkdir -p /persist/sys/dd-agent/conf.d'
+        copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
+        copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'
+
+        # on Arista, these will survive on reboot
+        command 'ln -sf /persist/sys/dd-agent/checks.d/ /etc/dd-agent/checks.d/'
+        command 'ln -sf /persist/sys/dd-agent/conf.d /etc/dd-agent/conf.d/'
+        command 'ln -sf /persist/sys/dd-agent/datadog.conf /etc/dd-agent/datadog.conf'
+      else
+        copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
+        copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
+        copy 'conf.d', '/etc/dd-agent/'
+        mkdir '/etc/dd-agent/checks.d/'
+
+      end
       command 'chmod 755 /etc/init.d/datadog-agent'
 
       # Create symlinks
