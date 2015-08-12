@@ -47,7 +47,9 @@ build do
         command 'chmod 755 /opt/datadog-agent/bin/start_agent.sh'
       end
 
-      if ohai['platform_family'] == 'arista'
+      # XXX: we want 'arista' here but since i can't get that yet. im assuming
+      # here that rhel at Fastly is really meant for Arista/Fedora.
+      if ohai['platform_family'] == 'rhel'
         command 'mkdir -p /etc/dd-agent/checks.d/'
         command 'mkdir -p /persist/sys/dd-agent/checks.d/'
         command 'mkdir -p /persist/sys/dd-agent/conf.d'
