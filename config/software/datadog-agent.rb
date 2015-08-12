@@ -47,7 +47,7 @@ build do
         command 'chmod 755 /opt/datadog-agent/bin/start_agent.sh'
       end
 
-      if Ohai['platform_family'] == 'arista'
+      if ohai['platform_family'] == 'arista'
         command 'mkdir -p /etc/dd-agent/checks.d/'
         command 'mkdir -p /persist/sys/dd-agent/checks.d/'
         command 'mkdir -p /persist/sys/dd-agent/conf.d'

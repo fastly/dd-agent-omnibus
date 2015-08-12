@@ -6,8 +6,8 @@ USE_ROOT_SUPERVISOR="yes"
 #LOG_LEVEL="debug" # default to "info"
 #LOCAL_AGENT_REPO="~/dd-agent" # Path to a local repo of the agent to build from. Defaut is not set and the build will be done against the github repo
 
-mkdir -p pkg
-mkdir -p "cache/$PLATFORM"
+mkdir -p ../pkg
+mkdir -p "../cache/$PLATFORM"
 docker pull "datadog/docker-dd-agent-build-$PLATFORM"
 docker rm -f "dd-agent-build-$PLATFORM"
 docker run --name "dd-agent-build-$PLATFORM" \
@@ -16,6 +16,6 @@ docker run --name "dd-agent-build-$PLATFORM" \
   -e AGENT_BRANCH=$AGENT_BRANCH \
   -e AGENT_VERSION=$AGENT_VERSION \
   -e USE_ROOT_SUPERVISOR=$USE_ROOT_SUPERVISOR \
-  -v `pwd`/pkg:/dd-agent-omnibus/pkg \
-  -v "`pwd`/cache/$PLATFORM:/var/cache/omnibus" \
+  -v ../pkg:/dd-agent-omnibus/pkg \
+  -v "../cache/$PLATFORM:/var/cache/omnibus" \
   "datadog/docker-dd-agent-build-$PLATFORM"

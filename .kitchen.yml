@@ -12,36 +12,24 @@ driver:
     memory: 4096
   synced_folders:
     - ['.', '/home/vagrant/dd-agent-omnibus']
-    - ['../omnibus', '/home/vagrant/omnibus']
-    - ['../omnibus-software', '/home/vagrant/omnibus-software']
 
 provisioner:
   name: chef_zero
   require_chef_omnibus: true # Always install the latest version of Chef
 
+provisioner:
+  name: shell
+
 platforms:
-  - name: centos-5.10
-    run_list: yum-epel::default
-  - name: centos-6.5
-    run_list: yum-epel::default
-  - name: fedora-19
-    run_list: yum-epel::default
-  - name: debian-7.2.0
-    run_list: apt::default
-  - name: debian-7.4
-    run_list: apt::default
-  - name: debian-6.0.8
-    run_list: apt::default
   - name: ubuntu-12.04
-    run_list: apt::default
-  - name: ubuntu-12.10
-    run_list: apt::default
-  - name: ubuntu-13.04
-    run_list: apt::default
-  - name: ubuntu-13.10
-    run_list: apt::default
-  - name: ubuntu-14.04
-    run_list: apt::default
+    driver:
+      box: ubuntu-1204-chef-11.18.12-1-vb5
+  - name: ubuntu-12.04-linux-3.13
+    driver:
+      box: ubuntu-1204-chef-11.18.12-1-vb5-docker-kernel-3.13
+  - name: fedora-19
+    driver:
+      box_url: "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_fedora-19_chef-provisionerless.box"
 
 attribute_defaults: &attribute_defaults
   build_user:          vagrant
@@ -52,7 +40,7 @@ golang_defaults: &golang_defaults
   smc: false
 
 suites:
-  - name: dd-agent
+  - name: default
     attributes:
       omnibus:
         <<: *attribute_defaults
@@ -60,5 +48,5 @@ suites:
       golang:
         <<: *golang_defaults
     run_list:
-      - omnibus::default
       - golang::default
+      - build::omnibus
