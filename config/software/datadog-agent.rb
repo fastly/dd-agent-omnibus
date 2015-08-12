@@ -51,6 +51,7 @@ build do
       # here that rhel at Fastly is really meant for Arista/Fedora.
       if ohai['platform_family'] == 'rhel'
         command 'mkdir -p /etc/dd-agent/checks.d/'
+        command 'mkdir -p /etc/dd-agent/conf.d/'
         command 'mkdir -p /persist/sys/dd-agent/checks.d/'
         command 'mkdir -p /persist/sys/dd-agent/conf.d'
         copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
