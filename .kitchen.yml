@@ -1,0 +1,52 @@
+#
+# NOTE: this runs the omnibus cookbook, but does not actually run Omnibus. Use
+# 'kichen converge' to setup the virtual machine and then `kitchen login` to
+# SSH into the machine and run Omnibus.
+#
+
+driver:
+  name: vagrant
+  forward_agent: yes
+  customize:
+    cpus: 4
+    memory: 4096
+  synced_folders:
+    - ['.', '/home/vagrant/dd-agent-omnibus']
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: true # Always install the latest version of Chef
+
+provisioner:
+  name: shell
+
+platforms:
+  - name: ubuntu-12.04
+    driver:
+      box: ubuntu-1204-chef-11.18.12-1-vb5
+  - name: ubuntu-12.04-linux-3.13
+    driver:
+      box: ubuntu-1204-chef-11.18.12-1-vb5-docker-kernel-3.13
+  - name: fedora-19
+    driver:
+      box_url: "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_fedora-19_chef-provisionerless.box"
+
+attribute_defaults: &attribute_defaults
+  build_user:          vagrant
+  build_user_group:    vagrant
+  build_user_password: vagrant
+golang_defaults: &golang_defaults
+  version: '1.2.2'
+  smc: false
+
+suites:
+  - name: default
+    attributes:
+      omnibus:
+        <<: *attribute_defaults
+        install_dir: /opt/dd-agent
+      golang:
+        <<: *golang_defaults
+    run_list:
+      - golang::default
+      - build::omnibus

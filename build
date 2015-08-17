@@ -1,0 +1,21 @@
+PLATFORM="rpm-x64" # must be in "deb-x64", "deb-i386", "rpm-x64", "rpm-i386"
+AGENT_BRANCH="5.4.x-root" # Branch of dd-agent repo to use, default "master"
+OMNIBUS_BRANCH="fastly" # Branch of dd-agent-omnibus repo to use, default "master"
+USE_ROOT_SUPERVISOR="yes"
+#AGENT_VERSION="5.4.0" # default to the latest tag on that branch
+#LOG_LEVEL="debug" # default to "info"
+#LOCAL_AGENT_REPO="~/dd-agent" # Path to a local repo of the agent to build from. Defaut is not set and the build will be done against the github repo
+
+mkdir -p ../pkg
+mkdir -p "../cache/$PLATFORM"
+docker pull "datadog/docker-dd-agent-build-$PLATFORM"
+docker rm -f "dd-agent-build-$PLATFORM"
+docker run --name "dd-agent-build-$PLATFORM" \
+  -e OMNIBUS_BRANCH=$OMNIBUS_BRANCH \
+  -e LOG_LEVEL=$LOG_LEVEL \
+  -e AGENT_BRANCH=$AGENT_BRANCH \
+  -e AGENT_VERSION=$AGENT_VERSION \
+  -e USE_ROOT_SUPERVISOR=$USE_ROOT_SUPERVISOR \
+  -v ../pkg:/dd-agent-omnibus/pkg \
+  -v "../cache/$PLATFORM:/var/cache/omnibus" \
+  "datadog/docker-dd-agent-build-$PLATFORM"

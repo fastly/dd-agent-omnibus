@@ -9,7 +9,7 @@
 PROJECT_DIR=dd-agent-omnibus
 PROJECT_NAME=datadog-agent
 LOG_LEVEL=${LOG_LEVEL:-"info"}
-OMNIBUS_BRANCH=${OMNIBUS_BRANCH:-"master"}
+OMNIBUS_BRANCH=${OMNIBUS_BRANCH:-"fastly"}
 OMNIBUS_SOFTWARE_BRANCH=${OMNIBUS_SOFTWARE_BRANCH:-"master"}
 
 # Clean up omnibus artifacts
@@ -38,5 +38,6 @@ git --git-dir=/var/cache/omnibus/cache/git_cache/opt/datadog-agent tag -d `git -
 git --git-dir=/var/cache/omnibus/cache/git_cache/opt/datadog-agent tag -d `git --git-dir=/var/cache/omnibus/cache/git_cache/opt/datadog-agent tag -l | grep datadog-gohai`
 
 # Install the gems we need, with stubs in bin/
+bundle install --binstubs
 bundle update # Make sure to update to the latest version of omnibus-software
 bin/omnibus build -l=$LOG_LEVEL $PROJECT_NAME
