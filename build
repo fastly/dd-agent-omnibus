@@ -1,6 +1,6 @@
 PLATFORM="rpm-i386" # must be in "deb-x64", "deb-i386", "rpm-x64", "rpm-i386"
 AGENT_BRANCH="master" # Branch of dd-agent repo to use, default "master"
-OMNIBUS_BRANCH="master" # Branch of dd-agent-omnibus repo to use, default "master"
+OMNIBUS_BRANCH="wip" # Branch of dd-agent-omnibus repo to use, default "master"
 USE_ROOT_SUPERVISOR="yes"
 #AGENT_VERSION="5.4.0" # default to the latest tag on that branch
 #LOG_LEVEL="debug" # default to "info"
