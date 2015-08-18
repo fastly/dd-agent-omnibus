@@ -1,5 +1,5 @@
 #! /bin/sh
-LINUX_DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon|Arista)" /etc/issue || grep -Eo "Arista" /etc/Eos-release)
+LINUX_DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon)" /etc/issue)
 
 if [ -f "/etc/debian_version" ] || [ "$LINUX_DISTRIBUTION" == "Debian" ] || [ "$LINUX_DISTRIBUTION" == "Ubuntu" ]; then
     if command -v invoke-rc.d >/dev/null 2>&1; then
@@ -11,7 +11,7 @@ if [ -f "/etc/debian_version" ] || [ "$LINUX_DISTRIBUTION" == "Debian" ] || [ "$
     else
         /etc/init.d/datadog-agent stop || true
     fi
-elif [ -f "/etc/redhat-release" ] || [ -f "/etc/Eos-release"] || [ "$LINUX_DISTRIBUTION" == "RedHat" ] || [ "$LINUX_DISTRIBUTION" == "CentOS" ] || [ "$LINUX_DISTRIBUTION" == "openSUSE" ] || [ "$LINUX_DISTRIBUTION" == "Amazon" ] || [ "$LINUX_DISTRIBUTION" == "Arista" ]; then
+elif [ -f "/etc/redhat-release" ] || [ -f "/etc/Eos-release" ] || [ "$LINUX_DISTRIBUTION" == "RedHat" ] || [ "$LINUX_DISTRIBUTION" == "CentOS" ] || [ "$LINUX_DISTRIBUTION" == "openSUSE" ] || [ "$LINUX_DISTRIBUTION" == "Amazon" ] ]; then
     case "$*" in
           0)
             # We're uninstalling.
