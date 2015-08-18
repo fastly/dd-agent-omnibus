@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
   # Mount omnibus to have the builder code!
   current_dir = File.expand_path('..', __FILE__)
   config.vm.synced_folder current_dir, '/home/vagrant/dd-agent-omnibus'
-  config.vm.synced_folder '/Users/bao/fastly/docker-dd-agent-build-rpm-i386', '/home/vagrant/docker-dd-agent'
+  config.vm.synced_folder '/Users/bao/fastly/docker-dd-agent-build-rpm-i386', '/home/vagrant/docker-dd-agent-build-rpm-i386'
   # Mount local agent repo if asked to
   if ENV['LOCAL_AGENT_REPO']
     config.vm.synced_folder ENV['LOCAL_AGENT_REPO'], '/home/vagrant/dd-agent'
@@ -104,14 +104,11 @@ ENVSCRIPT
     env_variables_script += "\necho export #{var}=#{ENV[var]} >> #{profile_file}"
   end
   config.vm.provision 'shell', inline: env_variables_script
-  config.vm.provision 'shell', inline: 'sudo apt-get update; sudo apt-get install -y curl git'
-  config.vm.provision 'shell', inline: 'curl -sSL https://get.docker.com/ | sh && sudo usermod -aG docker vagrant'
 
-  # # Do the real work, build it!
-  # config.vm.provision 'shell', path: 'omnibus_build.sh'
-  #
-  # if ENV['CLEAR_CACHE'] == "true"
-  #   config.vm.provision "shell",
-  #     inline: "echo Clearing Omnibus cache && rm -rf /var/cache/omnibus/*"
-  # end
+  config.vm.provision 'shell', path: 'build_setup.sh'
+
+  if ENV['CLEAR_CACHE'] == "true"
+    config.vm.provision "shell",
+      inline: "echo Clearing Omnibus cache && rm -rf /var/cache/omnibus/*"
+  end
 end

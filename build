@@ -1,14 +1,14 @@
 PLATFORM="rpm-i386" # must be in "deb-x64", "deb-i386", "rpm-x64", "rpm-i386"
 AGENT_BRANCH="master" # Branch of dd-agent repo to use, default "master"
-OMNIBUS_BRANCH="master" # Branch of dd-agent-omnibus repo to use, default "master"
+OMNIBUS_BRANCH="wip" # Branch of dd-agent-omnibus repo to use, default "master"
 USE_ROOT_SUPERVISOR="yes"
 #AGENT_VERSION="5.4.0" # default to the latest tag on that branch
 #LOG_LEVEL="debug" # default to "info"
-#LOCAL_AGENT_REPO="~/dd-agent" # Path to a local repo of the agent to build from. Defaut is not set and the build will be done against the github repo
+LOCAL_AGENT_REPO="~/dd-agent" # Path to a local repo of the agent to build from. Defaut is not set and the build will be done against the github repo
 
-mkdir -p /pkg
-mkdir -p "/cache/$PLATFORM"
-docker pull "fastly/docker-dd-agent-build-$PLATFORM"
+mkdir -p pkg
+mkdir -p "cache/$PLATFORM"
+#docker pull "fastly/docker-dd-agent-build-$PLATFORM"
 docker rm -f "dd-agent-build-$PLATFORM"
 docker run --name "dd-agent-build-$PLATFORM" \
   -e OMNIBUS_BRANCH=$OMNIBUS_BRANCH \
@@ -20,7 +20,17 @@ docker run --name "dd-agent-build-$PLATFORM" \
   -v "`pwd`/cache/$PLATFORM:/var/cache/omnibus" \
   "fastly/docker-dd-agent-build-$PLATFORM"
 
-# if [ ! -f './veos/']; then
-#   curl -SOL https://s3.amazonaws.com/fastly-files/public/eos_root.tar.gz
-#   tar zxf eos_root.tar.gz
-# fi
+if [ ! -f ~/eos/usr/bin/swix ]; then
+  curl -SOL https://s3.amazonaws.com/fastly-files/public/eos_root.tar.gz
+  sudo tar zxf eos_root.tar.gz && rm -rf eos_root.tar.gz
+fi
+
+# XXX: find a way to extract file name
+#export FILE=`find ~/pkg -type f -printf "%f\n"`
+export FILE='datadog-agent-0.0.0-1.i686.rpm'
+sudo cp ~/pkg/$FILE ~/eos
+sudo chroot ~/eos /usr/bin/swix create --force datadog-agent.swix $FILE
+sudo rm -rf  ~/eos/*.rpm
+sudo rm -rf  ~/pkg/*
+s3cmd -c ~/dd-agent-omnibus/.s3cfg put eos/datadog-agent.swix s3://fastly-files/private/swix/
+sudo rm -rf  ~/eos/*.swix
