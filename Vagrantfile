@@ -20,14 +20,7 @@ Vagrant.configure("2") do |config|
   config.cache.scope = :box
 
  vms_to_use = {
-    'ubuntu-i386' => 'ubuntu-10.04-i386',
-    'ubuntu-x64' => 'ubuntu-10.04',
-    'debian-i386' => 'debian-6.0.8-i386',
-    'debian-x64' => 'debian-6.0.8',
-    'fedora-i386' => 'fedora-19-i386',
-    'fedora-x64' => 'fedora-19',
-    'centos-i386' => 'centos-5.10-i386',
-    'centos-x64' => 'centos-5.10',
+    'ubuntu-x64' => 'ubuntu-14.04'
     }
 
   vms_to_use.each_pair do |key, platform|
@@ -62,6 +55,7 @@ Vagrant.configure("2") do |config|
   # Mount omnibus to have the builder code!
   current_dir = File.expand_path('..', __FILE__)
   config.vm.synced_folder current_dir, '/home/vagrant/dd-agent-omnibus'
+  config.vm.synced_folder '/Users/bao/fastly/docker-dd-agent-build-rpm-i386', '/home/vagrant/docker-dd-agent'
   # Mount local agent repo if asked to
   if ENV['LOCAL_AGENT_REPO']
     config.vm.synced_folder ENV['LOCAL_AGENT_REPO'], '/home/vagrant/dd-agent'
@@ -85,7 +79,6 @@ Vagrant.configure("2") do |config|
     }
 
     chef.run_list = [
-      "recipe[omnibus::default]",
       "recipe[golang]"
     ]
   end
@@ -111,12 +104,14 @@ ENVSCRIPT
     env_variables_script += "\necho export #{var}=#{ENV[var]} >> #{profile_file}"
   end
   config.vm.provision 'shell', inline: env_variables_script
+  config.vm.provision 'shell', inline: 'sudo apt-get update; sudo apt-get install -y curl git'
+  config.vm.provision 'shell', inline: 'curl -sSL https://get.docker.com/ | sh && sudo usermod -aG docker vagrant'
 
-  # Do the real work, build it!
-  config.vm.provision 'shell', path: 'omnibus_build.sh'
-
-  if ENV['CLEAR_CACHE'] == "true"
-    config.vm.provision "shell",
-      inline: "echo Clearing Omnibus cache && rm -rf /var/cache/omnibus/*"
-  end
+  # # Do the real work, build it!
+  # config.vm.provision 'shell', path: 'omnibus_build.sh'
+  #
+  # if ENV['CLEAR_CACHE'] == "true"
+  #   config.vm.provision "shell",
+  #     inline: "echo Clearing Omnibus cache && rm -rf /var/cache/omnibus/*"
+  # end
 end
