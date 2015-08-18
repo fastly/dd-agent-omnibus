@@ -57,6 +57,7 @@ build do
           copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
           copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
           mkdir '/etc/dd-agent/checks.d/'
+          copy 'conf.d', '/etc/dd-agent/'
         else
           copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
           copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'

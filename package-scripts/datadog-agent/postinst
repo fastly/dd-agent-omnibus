@@ -61,7 +61,7 @@ if [ "$DISTRIBUTION" != "Darwin" ]; then
       chown -R dd-agent:root ${CONFIG_DIR}
       chown -R dd-agent:root ${LOG_DIR}
       # on Arista, these will survive on reboot
-      wln -sf /opt/metrics/checks.d/ /etc/dd-agent/
+      ln -sf /opt/metrics/checks.d/ /etc/dd-agent/
       ln -sf /opt/metrics/conf.d /etc/dd-agent/
       ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf
   else
