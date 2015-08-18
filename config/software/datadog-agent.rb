@@ -58,7 +58,6 @@ build do
         if use_root_supervisor.nil? || use_root_supervisor.empty?
           copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
           copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
-          copy 'conf.d', '/etc/dd-agent/'
           mkdir '/etc/dd-agent/checks.d/'
         else
           copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
