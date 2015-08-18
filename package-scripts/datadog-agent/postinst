@@ -60,13 +60,6 @@ if [ "$DISTRIBUTION" != "Darwin" ]; then
   if ! [ -f /etc/Eos-release ]; then
       chown -R dd-agent:root ${CONFIG_DIR}
       chown -R dd-agent:root ${LOG_DIR}
-
-      # on Arista, these will survive on reboot
-      mkdir -p /persist/sys/dd-agent/checks.d/
-      mkdir -p /persist/sys/dd-agent/conf.d
-      ln -sf /persist/sys/dd-agent/checks.d/ /etc/dd-agent/
-      ln -sf /persist/sys/dd-agent/conf.d /etc/dd-agent/
-      ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf
   else
       chown -R root:root ${CONFIG_DIR}
       chown -R root:root ${LOG_DIR}
