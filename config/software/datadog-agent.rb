@@ -52,8 +52,6 @@ build do
         command 'chmod 755 /opt/datadog-agent/bin/start_agent.sh'
       end
 
-      # XXX: we want 'arista' here but since i can't get that yet. im assuming
-      # here that rhel at Fastly is really meant for Arista/Fedora.
       if ohai['platform_family'] == 'rhel'
         if use_root_supervisor.nil? || use_root_supervisor.empty?
           copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
@@ -62,11 +60,6 @@ build do
         else
           copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
           copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'
-
-          # on Arista, these will survive on reboot
-          command 'ln -sf /opt/metrics/checks.d/ /etc/dd-agent/'
-          command 'ln -sf /opt/metrics/conf.d /etc/dd-agent/'
-          command 'ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf'
         end
       end
       command 'chmod 755 /etc/init.d/datadog-agent'
