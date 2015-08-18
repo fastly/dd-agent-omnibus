@@ -4,7 +4,7 @@ INSTALL_DIR=/opt/datadog-agent
 LOG_DIR=/var/log/datadog
 RUN_DIR=$INSTALL_DIR/run
 
-DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon|Arista)" /etc/issue 2>/dev/null || grep -Eo /etc/Eos-release || uname -s)
+DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon)" /etc/issue 2>/dev/null || uname -s)
 
 error_exit()
 {
@@ -53,10 +53,17 @@ if [ "$DISTRIBUTION" != "Darwin" ]; then
   fi
 
   # Set proper rights to the dd-agent user
-  chown -R dd-agent:root ${CONFIG_DIR}
-  chown -R dd-agent:root ${LOG_DIR}
+  # On Arista EOS, the agent runs as root
   chown root:root /etc/init.d/datadog-agent
   chown -R root:root /opt/datadog-agent
+
+  if ! [ -f /etc/Eos-release ]; then
+      chown -R dd-agent:root ${CONFIG_DIR}
+      chown -R dd-agent:root ${LOG_DIR}
+  else
+      chown -R root:root ${CONFIG_DIR}
+      chown -R root:root ${LOG_DIR}
+  fi
 
   if command -v chkconfig >/dev/null 2>&1; then
       chkconfig --add datadog-agent

@@ -4,7 +4,7 @@ INSTALL_DIR=/opt/datadog-agent
 LOG_DIR=/var/log/datad
 mkdir -p $LOG_DIR
 
-DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon|Arista)" /etc/issue 2>/dev/null || grep -Eo "Arista" /etc/Eos-release || uname -s)
+DISTRIBUTION=$(grep -Eo "(Debian|Ubuntu|RedHat|CentOS|openSUSE|Amazon)" /etc/issue 2>/dev/null || uname -s)
 
 # Linux installation
 if [ "$DISTRIBUTION" != "Darwin" ]; then
@@ -34,12 +34,17 @@ if [ "$DISTRIBUTION" != "Darwin" ]; then
 
     #DEBHELPER#
 
-  elif [ -f "/etc/redhat-release" ] || [ -f "/etc/system-release" ] || [ -f "/etc/Eos-release" ] || [ "$DISTRIBUTION" == "RedHat" ] || [ "$DISTRIBUTION" == "CentOS" ] || [ "$DISTRIBUTION" == "openSUSE" ] || [ "$DISTRIBUTION" == "Amazon" ] || [ "$DISTRIBUTION" == "Arista" ]; then
+  elif [ -f "/etc/redhat-release" ] || [ -f "/etc/system-release" ] || [ "$DISTRIBUTION" == "RedHat" ] || [ "$DISTRIBUTION" == "CentOS" ] || [ "$DISTRIBUTION" == "openSUSE" ] || [ "$DISTRIBUTION" == "Amazon" ] ]; then
     getent group dd-agent >/dev/null || groupadd -r dd-agent
     getent passwd dd-agent >/dev/null || \
       useradd -r -M -g dd-agent -d /opt/datadog-agent -s /bin/sh \
         -c "Datadog Agent" dd-agent
     # Stop the old agent before installing
+    if [ -f "/etc/init.d/datadog-agent" ]; then
+      /etc/init.d/datadog-agent stop || true
+    fi
+  elif [ -f "/etc/Eos-release" ]; then
+    echo "Running on Arista EOS, Agent will be run as root."
     if [ -f "/etc/init.d/datadog-agent" ]; then
       /etc/init.d/datadog-agent stop || true
     fi

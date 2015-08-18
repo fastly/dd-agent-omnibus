@@ -3,6 +3,7 @@ require './lib/ostools.rb'
 name 'datadog-agent'
 
 local_agent_repo = ENV['LOCAL_AGENT_REPO']
+use_root_supervisor = ENV['USE_ROOT_SUPERVISOR']
 if local_agent_repo.nil? || local_agent_repo.empty?
   source git: 'https://github.com/fastly/dd-agent.git'
 else
@@ -38,7 +39,11 @@ build do
     # Configuration files
     mkdir '/etc/dd-agent'
       if ohai['platform_family'] == 'rhel'
-        copy 'packaging/centos/datadog-agent.init', '/etc/rc.d/init.d/datadog-agent'
+        if use_root_supervisor.nil? || use_root_supervisor.empty?
+          copy 'packaging/centos/datadog-agent.init', '/etc/rc.d/init.d/datadog-agent'
+        else
+          copy 'packaging/centos/datadog-agent_arista.init', '/etc/rc.d/init.d/datadog-agent'
+        end
       elsif ohai['platform_family'] == 'debian'
         copy 'packaging/debian/datadog-agent.init', '/etc/init.d/datadog-agent'
         mkdir '/lib/systemd/system'
@@ -50,20 +55,22 @@ build do
       # XXX: we want 'arista' here but since i can't get that yet. im assuming
       # here that rhel at Fastly is really meant for Arista/Fedora.
       if ohai['platform_family'] == 'rhel'
-        copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
-        copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'
+        if use_root_supervisor.nil? || use_root_supervisor.empty?
+          copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
+          copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
+          copy 'conf.d', '/etc/dd-agent/'
+          mkdir '/etc/dd-agent/checks.d/'
+        else
+          copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
+          copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'
 
-        # on Arista, these will survive on reboot
-        command 'mkdir -p /persist/sys/dd-agent/checks.d/'
-        command 'mkdir -p /persist/sys/dd-agent/conf.d'
-        command 'ln -sf /persist/sys/dd-agent/checks.d/ /etc/dd-agent/'
-        command 'ln -sf /persist/sys/dd-agent/conf.d /etc/dd-agent/'
-        command 'ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf'
-      else
-        copy 'packaging/supervisor.conf', '/etc/dd-agent/supervisor.conf'
-        copy 'datadog.conf.example', '/etc/dd-agent/datadog.conf.example'
-        copy 'conf.d', '/etc/dd-agent/'
-        mkdir '/etc/dd-agent/checks.d/'
+          # on Arista, these will survive on reboot
+          command 'mkdir -p /persist/sys/dd-agent/checks.d/'
+          command 'mkdir -p /persist/sys/dd-agent/conf.d'
+          command 'ln -sf /persist/sys/dd-agent/checks.d/ /etc/dd-agent/'
+          command 'ln -sf /persist/sys/dd-agent/conf.d /etc/dd-agent/'
+          command 'ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf'
+        end
       end
       command 'chmod 755 /etc/init.d/datadog-agent'
 
