@@ -63,10 +63,8 @@ build do
         else
           copy 'packaging/supervisor.conf.arista', '/etc/dd-agent/supervisor.conf'
           copy 'datadog.conf.arista', '/etc/dd-agent/datadog.conf.example'
-
-          # on Arista, these will survive on reboot
-          command 'mkdir -p /persist/sys/dd-agent/checks.d/'
-          command 'mkdir -p /persist/sys/dd-agent/conf.d'
+          copy 'conf.d', '/etc/dd-agent/'
+          mkdir '/etc/dd-agent/checks.d/'
         end
       end
       command 'chmod 755 /etc/init.d/datadog-agent'
