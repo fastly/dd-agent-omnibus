@@ -67,9 +67,6 @@ build do
           # on Arista, these will survive on reboot
           command 'mkdir -p /persist/sys/dd-agent/checks.d/'
           command 'mkdir -p /persist/sys/dd-agent/conf.d'
-          command 'ln -sf /persist/sys/dd-agent/checks.d/ /etc/dd-agent/'
-          command 'ln -sf /persist/sys/dd-agent/conf.d /etc/dd-agent/'
-          command 'ln -sf /persist/sys/datadog.conf /etc/dd-agent/datadog.conf'
         end
       end
       command 'chmod 755 /etc/init.d/datadog-agent'
