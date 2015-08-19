@@ -11,7 +11,7 @@ if [ -f "/etc/debian_version" ] || [ "$LINUX_DISTRIBUTION" == "Debian" ] || [ "$
         rm -rf /etc/dd-agent
         rm -rf /var/log/datadog
     fi
-elif [ -f "/etc/redhat-release" ] || [ "$LINUX_DISTRIBUTION" == "RedHat" ] || [ "$LINUX_DISTRIBUTION" == "CentOS" ] || [ "$LINUX_DISTRIBUTION" == "openSUSE" ] || [ "$LINUX_DISTRIBUTION" == "Amazon" ] ]; then
+elif [ -f "/etc/redhat-release" ] || [ "$LINUX_DISTRIBUTION" == "RedHat" ] || [ "$LINUX_DISTRIBUTION" == "CentOS" ] || [ "$LINUX_DISTRIBUTION" == "openSUSE" ] || [ "$LINUX_DISTRIBUTION" == "Amazon" ]; then
     case "$*" in
       0)
         # We're uninstalling.
